@@ -15,7 +15,11 @@ command = "spleeter separate -o audio_output -f {foldername}/{filename}_{instrum
 print(command)
 
 # 执行Shell命令，获取输出结果
-result = subprocess.run(command, shell=True, capture_output=True, text=True)
-
-# 打印输出结果
-print(result.stdout)
+try:
+    result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+    print("Command executed successfully.")
+    print("Command output:\n", result.stdout)
+except subprocess.CalledProcessError as e:
+    print("Command encountered an error with return code:", e.returncode)
+    print("Command error:\n", e.stderr)
+    raise e
