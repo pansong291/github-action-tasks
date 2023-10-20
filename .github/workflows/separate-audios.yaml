@@ -28,7 +28,7 @@ jobs:
       - name: Separate audio
         run: |
           cd separate-audios
-          python separate-audio.py
+          spleeter separate -o audio_output -f {foldername}/{filename}_{instrument}.{codec} audios/west-world.mp3
       - name: Compress file
         run: |
           cd separate-audios
