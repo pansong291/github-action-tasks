@@ -24,6 +24,5 @@ try:
     print("Command output:\n", result.stdout)
 except subprocess.CalledProcessError as e:
     print("Command encountered an error with return code:", e.returncode)
-    print("Command output:\n", e.stdout)
     print("Command error:\n", e.stderr)
     raise e
