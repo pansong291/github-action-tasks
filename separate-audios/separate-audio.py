@@ -14,9 +14,12 @@ command = "spleeter separate -o audio_output -f {foldername}/{filename}_{instrum
 
 print(command)
 
+# 设置环境变量
+env = {'GITHUB_REPOSITORY': 'deezer/spleeter'}
+
 # 执行Shell命令，获取输出结果
 try:
-    result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+    result = subprocess.run(command, shell=True, env=env, check=True, capture_output=True, text=True)
     print("Command executed successfully.")
     print("Command output:\n", result.stdout)
 except subprocess.CalledProcessError as e:
