@@ -28,6 +28,7 @@ jobs:
       - name: Separate audio
         run: |
           cd separate-audios
+          export GITHUB_REPOSITORY=deezer/spleeter
           spleeter separate -o audio_output -f {foldername}/{filename}_{instrument}.{codec} audios/west-world.mp3
       - name: Compress file
         run: |
