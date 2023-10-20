@@ -1,0 +1,11 @@
+--batch-file playlist.txt
+# --yes-playlist https://www.youtube.com/playlist?list=PL-454Fe3dQH1L38FnKkz_O1CqYx6sKaXk
+--format bestvideo+bestaudio
+--output downloads/%(title)s_%(id)s.%(ext)s
+--continue
+# --write-description
+# --write-info-json
+# --write-thumbnail
+
+# --external-downloader bin/aria2c
+# --external-downloader-args '-c -x 16 -k 1M'
