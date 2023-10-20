@@ -17,7 +17,7 @@ print(command)
 # 设置环境变量
 env = {}
 for key in os.environ:
-    env[key] = os.environ[k]
+    env[key] = os.environ[key]
 env['GITHUB_REPOSITORY'] = 'deezer/spleeter'
 
 # 执行Shell命令，获取输出结果
