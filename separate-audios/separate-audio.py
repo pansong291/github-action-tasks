@@ -10,7 +10,7 @@ files = os.listdir(directory)
 # 拼接相对路径并用空格隔开
 file_paths = " ".join([os.path.join(directory, file) for file in files])
 
-command = "spleetera separate -o audio_output -f {foldername}/{filename}_{instrument}.{codec} " + file_paths
+command = "spleeter separate -o audio_output -f {foldername}/{filename}_{instrument}.{codec} " + file_paths
 
 print(command)
 
