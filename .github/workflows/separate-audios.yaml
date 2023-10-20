@@ -13,6 +13,9 @@ jobs:
         run: |
           cd separate-audios
           pwd
+      - name: Show workspace
+        run: |
+          pwd
       - name: Set up python
         uses: actions/setup-python@v2
         with:
@@ -28,11 +31,9 @@ jobs:
       #   run: sudo apt install libsndfile
       - name: Install spleeter
         run: |
-          pwd
           python -m pip install -U spleeter
       - name: Separate audio
         run: |
-          pwd
           python separate-audio.py
       - name: Compress file
         run: |
