@@ -1,7 +1,18 @@
+# 指定多个视频
 --batch-file playlist.txt
+
+# 指定一个播放列表
 # --yes-playlist https://www.youtube.com/playlist?list=PL-454Fe3dQH1L38FnKkz_O1CqYx6sKaXk
+
+# 指定媒体格式
 --format bestvideo+bestaudio
+
+# 不合并视频和音频
+# --compat-options no-direct-merge
+
+# 指定输出格式
 --output downloads/%(title)s_%(id)s.%(ext)s
+
 --continue
 # --write-description
 # --write-info-json
