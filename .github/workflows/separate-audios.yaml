@@ -9,13 +9,6 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
-      - name: Switch workspace
-        run: |
-          cd separate-audios
-          pwd
-      - name: Show workspace
-        run: |
-          pwd
       - name: Set up python
         uses: actions/setup-python@v2
         with:
@@ -34,11 +27,14 @@ jobs:
           python -m pip install -U spleeter
       - name: Separate audio
         run: |
+          cd separate-audios
           python separate-audio.py
       - name: Compress file
         run: |
+          cd separate-audios
           zip -9 -r artifact.zip audio_output
       - name: Upload artifact
         run: |
+          cd separate-audios
           curl -sL https://git.io/file-transfer | sh
           ./transfer trs ./artifact.zip
