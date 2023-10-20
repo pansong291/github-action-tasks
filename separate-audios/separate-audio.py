@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # 指定目录路径
-directory = "./audios"
+directory = "audios"
 
 # 获取目录下的全部文件
 files = os.listdir(directory)
