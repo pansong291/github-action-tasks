@@ -15,7 +15,10 @@ command = "spleetera separate -o audio_output -f {foldername}/{filename}_{instru
 print(command)
 
 # 设置环境变量
-env = {'GITHUB_REPOSITORY': 'deezer/spleeter'}
+env = {}
+for key in os.environ:
+    env[key] = os.environ[k]
+env['GITHUB_REPOSITORY'] = 'deezer/spleeter'
 
 # 执行Shell命令，获取输出结果
 try:
