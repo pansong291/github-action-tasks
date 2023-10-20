@@ -13,23 +13,22 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Set up ffmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v1
-        with:
+#      - name: Set up ffmpeg
+#        uses: FedericoCarboni/setup-ffmpeg@v1
+#        with:
           # Not strictly necessary, but it may prevent rate limit
           # errors especially on GitHub-hosted macos machines.
-          token: ${{ secrets.GITHUB_TOKEN }}
-        id: setup-ffmpeg
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#        id: setup-ffmpeg
       # - name: Install libsndfile
       #   run: sudo apt install libsndfile
-      - name: Install spleeter
-        run: |
-          python -m pip install -U spleeter
+#      - name: Install spleeter
+#        run: |
+#          python -m pip install -U spleeter
       - name: Separate audio
         run: |
           cd separate-audios
-          export GITHUB_REPOSITORY=deezer/spleeter
-          spleeter separate -o audio_output -f {foldername}/{filename}_{instrument}.{codec} audios/west-world.mp3
+          python separate-audio.py
       - name: Compress file
         run: |
           cd separate-audios
