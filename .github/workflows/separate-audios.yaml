@@ -28,7 +28,9 @@ jobs:
       - name: Install spleeter
         run: python -m pip install -U spleeter
       - name: Separate audio
-        run: python separate-audio.py
+        run: |
+          pwd
+          python ./separate-audio.py
       - name: Compress file
         run: |
           zip -9 -r artifact.zip audio_output
