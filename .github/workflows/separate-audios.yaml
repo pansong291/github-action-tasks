@@ -1,14 +1,24 @@
 name: separate-audios
 
 on:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      args:
+        type: string
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ARGS: ${{ inputs.args }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
+      - name: Create Env State
+        run: |
+          npm install
+          npm run build-create-env-state
+          node workflow-distributor/dist/index.js
       - name: Prepare workspace
         run: mv separate-audios/* ./
       - name: Set up python

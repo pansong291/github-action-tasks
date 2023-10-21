@@ -1,0 +1,18 @@
+{
+  "name": "github-action-tasks",
+  "version": "1.0.0",
+  "repository": "https://github.com/pansong291/github-action-tasks",
+  "author": "pansong291",
+  "scripts": {
+    "build-distribute": "ncc build workflow-distributor/distribute.js -o workflow-distributor/dist",
+    "build-create-env-state": "ncc build workflow-distributor/create-env-state.js -o workflow-distributor/dist"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.7",
+    "@vercel/ncc": "^0.38.1"
+  }
+}

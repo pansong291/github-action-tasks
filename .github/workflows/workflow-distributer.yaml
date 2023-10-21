@@ -1,0 +1,29 @@
+name: workflow-distributor
+
+on:
+  issues:
+    types: [ opened ]
+  issue_comment:
+    types: [ created ]
+
+jobs:
+  distributor:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.distribute.outputs.run }}
+      args: ${{ steps.distribute.outputs.args }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - id: distribute
+        name: Distribute Tasks
+        run: |
+          npm install
+          npm run build-distribute
+          node workflow-distributor/dist/index.js
+  test:
+    needs: distributor
+    with:
+      args: ${{ needs.distributor.outputs.args }}
+    if: ${{ needs.distributor.outputs.run == 'test' }}
+    uses: ./.github/workflows/test.yaml

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "strict": true
+  },
+  "exclude": [
+    "node_modules",
+    "workflow-distributor/dist"
+  ]
+}

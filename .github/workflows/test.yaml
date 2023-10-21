@@ -1,0 +1,30 @@
+name: test
+
+on:
+  workflow_call:
+    inputs:
+      args:
+        type: string
+
+jobs:
+  build:
+    env:
+      ARGS: ${{ inputs.args }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Create Env State
+        run: |
+          npm install
+          npm run build-create-env-state
+          node workflow-distributor/dist/index.js
+      - id: step1
+        run: |
+          echo '${{ inputs.args }}'
+      - id: step2
+        run: pwd
+      - id: step3
+        run: ls -l
+      - id: step4
+        run: echo "$args1 - ${{ env.args2 }}"
