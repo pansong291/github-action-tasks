@@ -10,6 +10,9 @@
 # 不合并视频和音频
 # --compat-options no-direct-merge
 
+# 将视频转码为其他格式
+# --recode-video mp4
+
 # 指定输出格式
 --output downloads/%(title)s_%(id)s.%(ext)s
 
