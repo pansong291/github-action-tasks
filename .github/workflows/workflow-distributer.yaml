@@ -27,3 +27,9 @@ jobs:
       args: ${{ needs.distributor.outputs.args }}
     if: ${{ needs.distributor.outputs.run == 'test' }}
     uses: ./.github/workflows/test.yaml
+  separate-audios:
+    needs: distributor
+    with:
+      args: ${{ needs.distributor.outputs.args }}
+    if: ${{ needs.distributor.outputs.run == 'separate-audios' }}
+    uses: ./.github/workflows/separate-audios.yaml

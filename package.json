@@ -4,7 +4,8 @@
   "repository": "https://github.com/pansong291/github-action-tasks",
   "author": "pansong291",
   "scripts": {
-    "build-distribute": "ncc build workflow-distributor/distribute.js -o workflow-distributor/dist",
+    "build-distribute": "ncc build workflow-distributor/index.js -o workflow-distributor/dist",
+    "build-separate-audios": "ncc build separate-audios/index.js -o separate-audios/dist",
     "build-create-env-state": "ncc build workflow-distributor/create-env-state.js -o workflow-distributor/dist"
   },
   "dependencies": {

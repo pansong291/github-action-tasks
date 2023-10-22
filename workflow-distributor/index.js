@@ -1,6 +1,17 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
+const content = getContent(github.context)
+try {
+  const obj = parseObj(content)
+  Object.entries(obj).forEach(([k, v]) => {
+    core.info(k + ': ' + v)
+    core.setOutput(k, v)
+  })
+} catch (e) {
+  core.error(e)
+}
+
 function getContent(context) {
   const eventName = context.eventName
   const payload = context.payload
@@ -24,15 +35,4 @@ function parseObj(content) {
   const obj = JSON.parse(str)
   if (!obj?.run) throw Error('No target need to run')
   return { run: obj.run, args: JSON.stringify(obj.args) }
-}
-
-try {
-  const content = getContent(github.context)
-  const obj = parseObj(content)
-  Object.entries(obj).forEach(([k, v]) => {
-    core.info(k + ': ' + v)
-    core.setOutput(k, v)
-  })
-} catch (e) {
-  core.error(e)
 }

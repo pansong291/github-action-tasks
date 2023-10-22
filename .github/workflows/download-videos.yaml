@@ -40,5 +40,5 @@ jobs:
         run: zip -9 -r artifact.zip downloads
       - name: Upload artifact
         run: |
-          curl -sL https://git.io/file-transfer | sh
+          curl -sL https://raw.githubusercontent.com/Mikubill/transfer/master/install.sh | sh
           ./transfer trs ./artifact.zip
