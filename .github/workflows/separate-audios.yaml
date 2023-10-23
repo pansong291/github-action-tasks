@@ -14,27 +14,72 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
+
       - name: Build JS Files
         run: |
           npm install
           npm run build-separate-audios
+
       - name: Prepare workspace
-        run: mv separate-audios/* ./
+        run: |
+          mv separate-audios/* ./
+          mkdir downloads
+          mkdir segments
+          mkdir separates
+          mkdir outputs
+
       - name: Set up python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Set up ffmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
         id: setup-ffmpeg
+
       # - name: Install libsndfile
       #   run: sudo apt install libsndfile
+
       - name: Install spleeter
-        run: python -m pip install -U spleeter
+        run: |
+          python -m pip install -U spleeter
+
+      - name: Prepare download options
+        run: |
+          node dist/index.js prepare-env downloadFiles
+
+      - name: Download files
+        run: |
+          ${{ env.COMMANDS }}
+
+      - name: Prepare split audios options
+        run: |
+          node dist/index.js prepare-env ffmpegSplit
+
+      - name: Split audios
+        run: |
+          ${{ env.COMMANDS }}
+
+      - name: Prepare spleeter options
+        run: |
+          node dist/index.js prepare-env spleeter
+
       - name: Separate audio
-        run: node dist/index.js
+        run: |
+          ${{ env.COMMANDS }}
+
+      - name: Prepare concat audios options
+        run: |
+          node dist/index.js prepare-env ffmpegConcat
+
+      - name: Concat audios
+        run: |
+          ${{ env.COMMANDS }}
+
       - name: Compress file
-        run: zip -9 -r artifact.zip audio_output
+        run: |
+          zip -9 -r artifact.zip outputs
+
       - name: Upload artifact
         run: |
           curl -sL https://raw.githubusercontent.com/Mikubill/transfer/master/install.sh | sh

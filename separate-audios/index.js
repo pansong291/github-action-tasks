@@ -1,66 +1,96 @@
-import childProcess from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import * as core from '@actions/core'
-import { downloadFile, getFileNameFromURL } from '../src/utils'
+import { getFileNameFromURL } from '../src/utils'
 
-main()
+const downloadsDir = 'downloads'
+const segmentsDir = 'segments'
+const separatesDir = 'separates'
+const outputsDir = 'outputs'
+const ARGS = JSON.parse(process.env.ARGS)
 
-async function main() {
-  try {
-    const ARGS = JSON.parse(process.env.ARGS)
-    await prepareAudioFiles(ARGS)
-    const command = `spleeter separate ${getOptionString(ARGS)} ${getFilePathString()}`
-    core.info('执行命令:\n' + command)
-    const stdout = childProcess.execSync(command, { env: getEnv() })
-    core.info('命令输出结果:\n' + stdout)
-  } catch (e) {
-    core.setFailed(e)
-  }
-}
-
-/**
- * 准备音频文件
- */
-async function prepareAudioFiles(args) {
-  const { urls, zip } = args.download
-  if (urls && Array.isArray(urls)) {
-    fs.mkdirSync('audios', { recursive: true })
-    for (let i = 0; i < urls.length; i++) {
-      await downloadFile(urls[i], `audios/audio_${i}_${getFileNameFromURL(urls[i])}`)
+const commandSupplier = {
+  /**
+   * 下载文件
+   */
+  downloadFiles() {
+    const url = ARGS.download.url
+    if (url) {
+      const ep = escapePath(`${downloadsDir}/audio_${getFileNameFromURL(url)}`)
+      return `curl -kL -o ${ep} ${escapePath(url)}`
     }
-  } else if (zip) {
-    fs.mkdirSync('downloads', { recursive: true })
-    await downloadFile(zip, 'downloads/archive.zip')
-    childProcess.execSync('unzip -q -o -d audios/ downloads/archive.zip')
+    throw new Error(`download 参数中未指定 url`)
+  },
+  /**
+   * ffmpeg 分割音频
+   */
+  ffmpegSplit() {
+    const split = ARGS.ffmpeg?.split || 600
+    const files = fs.readdirSync(downloadsDir)
+    const filePath = files.map(fn => escapePath(path.join(downloadsDir, fn)))[0]
+    return `ffmpeg -i ${filePath} -f segment -segment_time ${split} -c copy ${segmentsDir}/%d.${ARGS.download.ext}`
+  },
+  /**
+   * 运行 spleeter
+   */
+  spleeter() {
+    const availableOptions = ['-b', '-c', '-p']
+    const options = {
+      '-o': separatesDir,
+      '-d': '660', // 11 分钟，实际上音频的长度需要小于这个值
+      '-f': '{instrument}/{filename}.{codec}',
+      '-c': 'wav'
+    }
+    const spleeterArgs = ARGS.spleeter
+    if (spleeterArgs) {
+      for (const op of availableOptions) {
+        if (spleeterArgs[op]) options[op] = spleeterArgs[op]
+      }
+    }
+    const optionStr = Object.entries(options).map(([k, v]) => `${k} ${v}`).join(' ')
+    const files = fs.readdirSync(segmentsDir)
+    const filePaths = files.map(fn => escapePath(path.join(segmentsDir, fn)))
+    return filePaths.map(p => `spleeter separate ${optionStr} ${p}`).join('\n')
+  },
+  /**
+   * ffmpeg 合并音频
+   */
+  ffmpegConcat() {
+    const cmds = []
+    const instruments = ['vocals', 'accompaniment']
+    for (const instrument of instruments) {
+      const audioFiles = fs.readdirSync(`${separatesDir}/${instrument}`)
+      const count = audioFiles.length
+      const first = audioFiles[0]
+      const ext = first.substring(first.indexOf('.') + 1)
+      const segmentPaths = []
+      for (let i = 0; i < count; i++) {
+        segmentPaths.push(`file '${i}.${ext}'`)
+      }
+      const filepath = `${separatesDir}/${instrument}/segments.txt`
+      fs.writeFileSync(filepath, segmentPaths.join('\n'))
+      cmds.push(`ffmpeg -f concat -safe 0 -i ${filepath} -c copy ${outputsDir}/${instrument}.${ext}`)
+    }
+    return cmds.join('\n')
   }
 }
 
-/**
- * 获取可用参数选项
- */
-function getOptionString(args) {
-  const availableOptions = ['-b', '-c', '-d', '-s', '-f', '-p']
-  const options = {
-    '-o': 'audio_output',
-    '-f': '{filename}_{instrument}.{codec}'
-  }
-  const spleeterArgs = args.spleeter
-  if (spleeterArgs) {
-    for (const op of availableOptions) {
-      if (spleeterArgs[op]) options[op] = spleeterArgs[op]
+const ME = {
+  'prepare-env': (key) => {
+    const supplier = commandSupplier[key]
+    if (supplier) {
+      core.exportVariable('COMMANDS', supplier())
+    } else {
+      core.setFailed(`不支持的变量: ${key}`)
     }
   }
-  return Object.entries(options).map(([k, v]) => `${k} ${v}`).join(' ')
 }
 
-/**
- * 获取音频文件路径
- */
-function getFilePathString() {
-  const directory = 'audios'
-  const files = fs.readdirSync(directory)
-  return files.map(fn => escapePath(path.join(directory, fn))).join(' ')
+const directive = process.argv[2]
+if (ME[directive]) {
+  ME[directive](process.argv[3])
+} else {
+  core.setFailed(`未知的指令: ${directive}`)
 }
 
 /**
@@ -68,19 +98,6 @@ function getFilePathString() {
  */
 function escapePath(p) {
   return `'${p.replaceAll(`'`, `'\\''`)}'`
-}
-
-/**
- * 获取环境变量
- * @see https://github.com/deezer/spleeter/issues/873
- */
-function getEnv() {
-  const env = {}
-  const excludes = ['GITHUB_HOST', 'GITHUB_REPOSITORY', 'GITHUB_RELEASE']
-  Object.entries(process.env).forEach(([k, v]) => {
-    if (!excludes.includes(k)) env[k] = v
-  })
-  return env
 }
 
 /*
