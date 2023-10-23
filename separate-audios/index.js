@@ -13,10 +13,7 @@ const ME = {
         core.exportVariable(key, getDownloadOptions(ARGS))
         break
       case 'SPLEETER_OPTIONS':
-        core.exportVariable(key, getSpleeterOptions(ARGS))
-        break
-      case 'FILE_PATHS':
-        core.exportVariable(key, getFilePaths())
+        core.exportVariable(key, `${getSpleeterOptions(ARGS)} ${getFilePaths()}`)
         break
       default:
         core.setFailed(`不支持的变量: ${key}`)
