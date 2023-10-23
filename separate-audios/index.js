@@ -36,7 +36,8 @@ async function prepareAudioFiles(args) {
   } else if (zip) {
     fs.mkdirSync('downloads', { recursive: true })
     await downloadFile(zip, 'downloads/archive.zip')
-    childProcess.execSync('unzip -q -o -d audios/ downloads/archive.zip')
+    console.log('开始解压文件')
+    childProcess.execSync('unzip -c -o -d audios/ downloads/archive.zip')
   }
 }
 
