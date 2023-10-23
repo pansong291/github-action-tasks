@@ -10,10 +10,9 @@ main()
 
 async function main() {
   try {
-    process.on('SIGTERM', () => {
-      // 在收到 SIGTERM 信号时执行自定义操作
-      console.log('收到 SIGTERM 信号.')
-    })
+    ['SIGINT', 'SIGTERM', 'SIGQUIT', 'STGKILL'].forEach(signal => process.on(signal, () => {
+      console.log(`收到 ${signal} 信号.`)
+    }))
     const ARGS = JSON.parse(process.env.ARGS)
     await prepareAudioFiles(ARGS)
     const option = getOptionString(ARGS)

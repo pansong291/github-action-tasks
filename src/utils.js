@@ -22,15 +22,23 @@ export function downloadFile(fileUrl, path) {
         return
       }
 
-      // 创建一个写入流
-      const writer = fs.createWriteStream(path)
-      // 将响应流导向写入流
-      res.pipe(writer)
-        .on('finish', () => {
-          console.info(`文件下载成功:\n ${fileUrl}\n ${path}`)
-          resolve(path)
-        })
-        .on('error', (err) => reject(`文件写入异常:\n ${err}`))
+      // 创建可写流，用于写入下载的数据
+      const fileStream = fs.createWriteStream(path)
+
+      // 监听 HTTP 响应的 data 事件
+      res.on('data', (chunk) => {
+        // 将每个数据块写入目标文件
+        fileStream.write(chunk)
+      })
+
+      // 监听 HTTP 响应的 end 事件
+      res.on('end', () => {
+        // 关闭可写流
+        fileStream.end()
+        console.log('Download completed!')
+        console.info(`文件下载成功:\n ${fileUrl}\n ${path}`)
+        resolve(path)
+      })
     }, (err) => {
       reject(`下载文件时发生错误:\n ${err}`)
     })
