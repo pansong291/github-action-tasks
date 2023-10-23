@@ -1,4 +1,3 @@
-import childProcess from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import * as core from '@actions/core'
@@ -18,16 +17,6 @@ const ME = {
         break
       default:
         core.setFailed(`不支持的变量: ${key}`)
-    }
-  },
-  'exec-spleeter': () => {
-    try {
-      const cmd = `spleeter separate ${process.env.SPLEETER_OPTIONS}`
-      core.info('执行命令:\n' + cmd)
-      const stdout = childProcess.execSync(cmd, { env: getEnv() })
-      core.info('命令输出结果:\n' + stdout)
-    } catch (e) {
-      core.setFailed(e)
     }
   }
 }
@@ -88,19 +77,6 @@ function getFilePaths() {
  */
 function escapePath(p) {
   return `'${p.replaceAll(`'`, `'\\''`)}'`
-}
-
-/**
- * 获取环境变量
- * @see https://github.com/deezer/spleeter/issues/873
- */
-function getEnv() {
-  const env = {}
-  const excludes = ['GITHUB_HOST', 'GITHUB_REPOSITORY', 'GITHUB_RELEASE']
-  Object.entries(process.env).forEach(([k, v]) => {
-    if (!excludes.includes(k)) env[k] = v
-  })
-  return env
 }
 
 /*

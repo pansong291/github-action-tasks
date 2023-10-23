@@ -60,8 +60,10 @@ jobs:
           node dist/index.js prepare-env SPLEETER_OPTIONS
 
       - name: Separate audio
+        env:
+          GITHUB_REPOSITORY: deezer/spleeter
         run: |
-          node dist/index.js exec-spleeter
+          spleeter separate ${{ env.SPLEETER_OPTIONS }}
 
       - name: Compress file
         run: |
