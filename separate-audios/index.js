@@ -10,10 +10,13 @@ async function main() {
   try {
     const ARGS = JSON.parse(process.env.ARGS)
     await prepareAudioFiles(ARGS)
-    const command = `spleeter separate ${getOptionString(ARGS)} ${getFilePathString()}`
-    core.info('执行命令:\n' + command)
-    const stdout = childProcess.execSync(command, { env: getEnv() })
-    core.info('命令输出结果:\n' + stdout)
+    const filePaths = getFilePaths()
+    for (const filePath of filePaths) {
+      const command = `spleeter separate ${getOptionString(ARGS)} ${filePath}`
+      core.info('执行命令:\n' + command)
+      const stdout = childProcess.execSync(command, { env: getEnv() })
+      core.info('命令输出结果:\n' + stdout)
+    }
   } catch (e) {
     core.setFailed(e)
   }
@@ -57,10 +60,10 @@ function getOptionString(args) {
 /**
  * 获取音频文件路径
  */
-function getFilePathString() {
+function getFilePaths() {
   const directory = 'audios'
   const files = fs.readdirSync(directory)
-  return files.map(fn => escapePath(path.join(directory, fn))).join(' ')
+  return files.map(fn => escapePath(path.join(directory, fn)))
 }
 
 /**
