@@ -10,9 +10,10 @@ async function main() {
   try {
     const ARGS = JSON.parse(process.env.ARGS)
     await prepareAudioFiles(ARGS)
+    const option = getOptionString(ARGS)
     const filePaths = getFilePaths()
     for (const filePath of filePaths) {
-      const command = `spleeter separate ${getOptionString(ARGS)} ${filePath}`
+      const command = `spleeter separate ${option} ${filePath}`
       core.info('执行命令:\n' + command)
       const stdout = childProcess.execSync(command, { env: getEnv() })
       core.info('命令输出结果:\n' + stdout)
