@@ -4,6 +4,8 @@ import path from 'node:path'
 import * as core from '@actions/core'
 import { downloadFile, getFileNameFromURL } from '../src/utils'
 
+
+const audiosDirectory = 'audios'
 main()
 
 async function main() {
@@ -15,7 +17,7 @@ async function main() {
     for (const filePath of filePaths) {
       const command = `spleeter separate ${option} ${filePath}`
       core.info('执行命令:\n' + command)
-      const stdout = childProcess.execSync(command, { env: getEnv() })
+      const stdout = childProcess.execSync(command, { env: getEnv(), killSignal: 'SIGKILL' })
       core.info('命令输出结果:\n' + stdout)
     }
   } catch (e) {
@@ -29,15 +31,17 @@ async function main() {
 async function prepareAudioFiles(args) {
   const { urls, zip } = args.download
   if (urls && Array.isArray(urls)) {
-    fs.mkdirSync('audios', { recursive: true })
+    fs.mkdirSync(audiosDirectory, { recursive: true })
     for (let i = 0; i < urls.length; i++) {
-      await downloadFile(urls[i], `audios/audio_${i}_${getFileNameFromURL(urls[i])}`)
+      await downloadFile(urls[i], `${audiosDirectory}/audio_${i}_${getFileNameFromURL(urls[i])}`)
     }
   } else if (zip) {
-    fs.mkdirSync('downloads', { recursive: true })
-    await downloadFile(zip, 'downloads/archive.zip')
-    console.log('开始解压文件')
-    childProcess.execSync('unzip -c -o -d audios/ downloads/archive.zip')
+    const downloadDir = 'downloads'
+    const zipPath = `${downloadDir}/archive.zip`
+    fs.mkdirSync(downloadDir, { recursive: true })
+    await downloadFile(zip, zipPath)
+    console.log(`开始解压文件到 ${audiosDirectory}/`)
+    childProcess.execSync(`unzip -c -o -d ${audiosDirectory}/ ${zipPath}`)
   }
 }
 
@@ -63,9 +67,8 @@ function getOptionString(args) {
  * 获取音频文件路径
  */
 function getFilePaths() {
-  const directory = 'audios'
-  const files = fs.readdirSync(directory)
-  return files.map(fn => escapePath(path.join(directory, fn)))
+  const files = fs.readdirSync(audiosDirectory)
+  return files.map(fn => escapePath(path.join(audiosDirectory, fn)))
 }
 
 /**
