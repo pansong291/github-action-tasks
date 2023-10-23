@@ -12,6 +12,7 @@ async function main() {
   try {
     ['SIGINT', 'SIGTERM', 'SIGQUIT', 'STGKILL'].forEach(signal => process.on(signal, () => {
       console.log(`收到 ${signal} 信号.`)
+      childProcess.execSync('node dist/index.js')
     }))
     const ARGS = JSON.parse(process.env.ARGS)
     await prepareAudioFiles(ARGS)

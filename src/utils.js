@@ -35,7 +35,6 @@ export function downloadFile(fileUrl, path) {
       res.on('end', () => {
         // 关闭可写流
         fileStream.end()
-        console.log('Download completed!')
         console.info(`文件下载成功:\n ${fileUrl}\n ${path}`)
         resolve(path)
       })
