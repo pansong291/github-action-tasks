@@ -1,58 +1,58 @@
-import childProcess from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import * as core from '@actions/core'
-import { downloadFile, getFileNameFromURL } from '../src/utils'
-
+import { getFileNameFromURL } from '../src/utils'
 
 const audiosDirectory = 'audios'
-main()
 
-async function main() {
-  try {
-    ['SIGINT', 'SIGTERM', 'SIGQUIT', 'STGKILL'].forEach(signal => process.on(signal, () => {
-      console.log(`收到 ${signal} 信号.`)
-      childProcess.execSync('node dist/index.js')
-    }))
+const ME = {
+  'prepare-env': (key) => {
     const ARGS = JSON.parse(process.env.ARGS)
-    await prepareAudioFiles(ARGS)
-    const option = getOptionString(ARGS)
-    const filePaths = getFilePaths()
-    for (const filePath of filePaths) {
-      const command = `spleeter separate ${option} ${filePath}`
-      core.info('执行命令:\n' + command)
-      const stdout = childProcess.execSync(command, { env: getEnv() })
-      core.info('命令输出结果:\n' + stdout)
+    switch (key) {
+      case 'DOWNLOAD_OPTIONS':
+        core.exportVariable(key, getDownloadOptions(ARGS))
+        break
+      case 'SPLEETER_OPTIONS':
+        core.exportVariable(key, getSpleeterOptions(ARGS))
+        break
+      case 'FILE_PATHS':
+        core.exportVariable(key, getFilePaths())
+        break
+      default:
+        core.setFailed(`不支持的变量: ${key}`)
     }
-  } catch (e) {
-    core.setFailed(e)
   }
 }
 
+const directive = process.argv[2]
+if (ME[directive]) {
+  ME[directive](process.argv[3])
+} else {
+  core.setFailed(`未知的指令: ${directive}`)
+}
+
 /**
- * 准备音频文件
+ * 获取下载参数
  */
-async function prepareAudioFiles(args) {
+function getDownloadOptions(args) {
   const { urls, zip } = args.download
   if (urls && Array.isArray(urls)) {
-    fs.mkdirSync(audiosDirectory, { recursive: true })
+    const list = []
     for (let i = 0; i < urls.length; i++) {
-      await downloadFile(urls[i], `${audiosDirectory}/audio_${i}_${getFileNameFromURL(urls[i])}`)
+      const ep = escapePath(`${audiosDirectory}/audio_${i}_${getFileNameFromURL(urls[i])}`)
+      list.push(`-o ${ep} ${escapePath(urls[i])}`)
     }
+    return list.join(' ')
   } else if (zip) {
-    const downloadDir = 'downloads'
-    const zipPath = `${downloadDir}/archive.zip`
-    fs.mkdirSync(downloadDir, { recursive: true })
-    await downloadFile(zip, zipPath)
-    console.log(`开始解压文件到 ${audiosDirectory}/`)
-    childProcess.execSync(`unzip -c -o -d ${audiosDirectory}/ ${zipPath}`)
+    core.exportVariable('FILE_ARCHIVE', 'zip')
+    return `-o downloads/archive.zip ${zip}`
   }
 }
 
 /**
  * 获取可用参数选项
  */
-function getOptionString(args) {
+function getSpleeterOptions(args) {
   const availableOptions = ['-b', '-c', '-d', '-s', '-f', '-p']
   const options = {
     '-o': 'audio_output',
@@ -72,7 +72,7 @@ function getOptionString(args) {
  */
 function getFilePaths() {
   const files = fs.readdirSync(audiosDirectory)
-  return files.map(fn => escapePath(path.join(audiosDirectory, fn)))
+  return files.map(fn => escapePath(path.join(audiosDirectory, fn))).join(' ')
 }
 
 /**
@@ -80,19 +80,6 @@ function getFilePaths() {
  */
 function escapePath(p) {
   return `'${p.replaceAll(`'`, `'\\''`)}'`
-}
-
-/**
- * 获取环境变量
- * @see https://github.com/deezer/spleeter/issues/873
- */
-function getEnv() {
-  const env = {}
-  const excludes = ['GITHUB_HOST', 'GITHUB_REPOSITORY', 'GITHUB_RELEASE']
-  Object.entries(process.env).forEach(([k, v]) => {
-    if (!excludes.includes(k)) env[k] = v
-  })
-  return env
 }
 
 /*

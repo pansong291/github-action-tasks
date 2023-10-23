@@ -14,27 +14,58 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
+
       - name: Build JS Files
         run: |
           npm install
           npm run build-separate-audios
+
       - name: Prepare workspace
-        run: mv separate-audios/* ./
+        run: |
+          mv separate-audios/* ./
+
       - name: Set up python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Set up ffmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
         id: setup-ffmpeg
+
       # - name: Install libsndfile
       #   run: sudo apt install libsndfile
+
       - name: Install spleeter
-        run: python -m pip install -U spleeter
+        run: |
+          python -m pip install -U spleeter
+
+      - name: Prepare download options
+        run: |
+          node dist/index.js prepare-env DOWNLOAD_OPTIONS
+
+      - name: Download files
+        run: |
+          curl -kL ${{ env.DOWNLOAD_OPTIONS }}
+
+      - name: Extract files
+        if: ${{ env.FILE_ARCHIVE == 'zip' }}
+        run: |
+          unzip -co -d audios/ downloads/archive.zip
+
+      - name: Prepare spleeter options
+        run: |
+          node dist/index.js prepare-env SPLEETER_OPTIONS
+          node dist/index.js prepare-env FILE_PATHS
+
       - name: Separate audio
-        run: node dist/index.js
+        run: |
+          spleeter separate ${{ env.SPLEETER_OPTIONS }} ${{ env.FILE_PATHS }}
+
       - name: Compress file
-        run: zip -9 -r artifact.zip audio_output
+        run: |
+          zip -9 -r artifact.zip audio_output
+
       - name: Upload artifact
         run: |
           curl -sL https://raw.githubusercontent.com/Mikubill/transfer/master/install.sh | sh
