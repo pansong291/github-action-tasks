@@ -47,6 +47,7 @@ jobs:
       - name: Download files
         run: |
           mkdir audios
+          mkdir downloads
           curl -kL ${{ env.DOWNLOAD_OPTIONS }}
 
       - name: Extract files
@@ -60,7 +61,7 @@ jobs:
 
       - name: Separate audio
         run: |
-          spleeter separate ${{ env.SPLEETER_OPTIONS }}
+          node dist/index.js exec-spleeter
 
       - name: Compress file
         run: |
