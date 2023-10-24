@@ -18,4 +18,4 @@ Performing tasks using GitHub Action.
 ## 备注
 
 ### 关于大文件输出
-可借鉴 [Grow](https://github.com/Borber/Grow) 项目，利用 [Transfer](https://github.com/Mikubill/transfer) ，把 Github Actions 输出的大文件上传到文件传输服务（如 [WeTransfer](https://wetransfer.com/) 等）上，再从传输服务处下载。经测试，下载速度比较快。[Testing by stl](https://github.com/Sweetlemon68/github-actions-youtube-dl)
+可借鉴 [Borber/Grow](https://github.com/Borber/Grow) 项目，利用 [Mikubill/transfer](https://github.com/Mikubill/transfer) ，把 Github Actions 输出的大文件上传到文件传输服务（如 [Transfer.sh](https://transfer.sh/) 等）上，再从传输服务处下载。经测试，下载速度比较快。[Testing by stl](https://github.com/Sweetlemon68/github-actions-youtube-dl)
