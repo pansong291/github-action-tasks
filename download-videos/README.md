@@ -6,16 +6,29 @@
 
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 
-使用 GitHub Actions 的服务器，从 YouTube 下载视频。将需要下载的视频添加到 playlist.txt 文件中，github action 运行的时候读取 playlist.txt 列表，下载列表中的所有视频，然后打包压缩，再将压缩包上传到文件传输服务。
+## 示例
+在 [issue](https://github.com/pansong291/github-action-tasks/issues) 提交以下内容（ ``` 符号必须单独占一行）：
+````markdown
+```json
+{
+  "run": "download-videos",
+  "args": {
+    "yt-dlp": {
+      "--batch-file": [
+        "https://www.youtube.com/watch?v=jF3er5lsaeg"
+      ],
+      "--yes-playlist": "https://www.youtube.com/playlist?list=PL-454Fe3dQH1L38FnKkz_O1CqYx6sKaXk"
+    }
+  }
+}
+```
+````
 
-## 使用
+- `yt-dlp` 对象中仅支持一部分 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的参数，其中 `--batch-file` 参数与 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 不同，它应为视频文件的下载链接数组，其余的如下所示：
 
-- 点右上角 **Fork** 按钮复制本 GitHub 仓库
-- 在自己的项目中，点上方 **Actions** 选项卡进入项目 GitHub Actions 页面, 点击绿色按钮 “**I understand my workflows, go ahead and enable them**” 开启功能
-- (可选) 编辑 [config.txt](./config.txt) 文件配置下载选项，具体参阅 [yt-dlp](https://github.com/yt-dlp/yt-dlp)
-- 编辑 [playlist.txt](./playlist.txt) 文件，将视频的 url 添加到列表中
-- 等待 github action 执行成功，查阅执行日志，找到压缩包下载链接
-
-## 备注
-
-可借鉴 [Grow](https://github.com/Borber/Grow) 项目，利用 [Transfer](https://github.com/Mikubill/transfer) ，把从 Youtube 下载的视频文件上传到文件传输服务（如 [WeTransfer](https://wetransfer.com/) 等）上，再从传输服务处下载。经测试，下载速度比较快。[Testing by stl](https://github.com/Sweetlemon68/github-actions-youtube-dl)
+| 参数 | 说明 | 默认值 |
+| ---- | ---- | ---- |
+| --yes-playlist | 指定一个播放列表。参见 [Video Selection](https://github.com/yt-dlp/yt-dlp#video-selection) |  |
+| --format | 指定下载的媒体格式。参见 [Video Format Options](https://github.com/yt-dlp/yt-dlp#video-format-options) | `bestvideo+bestaudio` |
+| --compat-options | 指定合并选项，比如 `no-direct-merge`。参见 [General Options](https://github.com/yt-dlp/yt-dlp#general-options) |  |
+| --recode-video | 将视频转码为其他格式，可用值：`avi` `flv` `gif` `mkv` `mov` `mp4` `webm` `aac` `aiff` `alac` `flac` `m4a` `mka` `mp3` `ogg` `opus` `vorbis` `wav`。参见 [Post-Processing Options](https://github.com/yt-dlp/yt-dlp#post-processing-options) |  |

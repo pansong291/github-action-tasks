@@ -44,7 +44,7 @@ jobs:
         run: |
           python -m pip install -U spleeter
 
-      - name: Prepare download options
+      - name: Prepare download commands
         run: |
           node dist/index.js prepare-env downloadFiles
 
@@ -52,7 +52,7 @@ jobs:
         run: |
           ${{ env.COMMANDS }}
 
-      - name: Prepare split audios options
+      - name: Prepare split audios commands
         run: |
           node dist/index.js prepare-env ffmpegSplit
 
@@ -60,7 +60,7 @@ jobs:
         run: |
           ${{ env.COMMANDS }}
 
-      - name: Prepare spleeter options
+      - name: Prepare spleeter commands
         run: |
           node dist/index.js prepare-env spleeter
 
@@ -68,7 +68,7 @@ jobs:
         run: |
           ${{ env.COMMANDS }}
 
-      - name: Prepare concat audios options
+      - name: Prepare concat audios commands
         run: |
           node dist/index.js prepare-env ffmpegConcat
 
@@ -76,11 +76,15 @@ jobs:
         run: |
           ${{ env.COMMANDS }}
 
+      - name: Prepare random name
+        run: |
+          node dist/index.js prepare-env RANDOM_NAME
+
       - name: Compress file
         run: |
-          zip -9 -r artifact.zip outputs
+          zip -9 -r artifact_${{ env.RANDOM_NAME }}.zip outputs
 
       - name: Upload artifact
         run: |
           curl -sL https://raw.githubusercontent.com/Mikubill/transfer/master/install.sh | sh
-          ./transfer trs ./artifact.zip
+          ./transfer trs ./artifact_${{ env.RANDOM_NAME }}.zip

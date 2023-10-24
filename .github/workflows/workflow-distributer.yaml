@@ -21,15 +21,24 @@ jobs:
           npm install
           npm run build-distribute
           node workflow-distributor/dist/index.js
+
   test:
     needs: distributor
     with:
       args: ${{ needs.distributor.outputs.args }}
     if: ${{ needs.distributor.outputs.run == 'test' }}
     uses: ./.github/workflows/test.yaml
+
   separate-audios:
     needs: distributor
     with:
       args: ${{ needs.distributor.outputs.args }}
     if: ${{ needs.distributor.outputs.run == 'separate-audios' }}
     uses: ./.github/workflows/separate-audios.yaml
+
+  download-videos:
+    needs: distributor
+    with:
+      args: ${{ needs.distributor.outputs.args }}
+    if: ${{ needs.distributor.outputs.run == 'download-videos' }}
+    uses: ./.github/workflows/download-videos.yaml

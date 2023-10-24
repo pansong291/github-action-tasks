@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import * as core from '@actions/core'
-import { getFileNameFromURL } from '../src/utils'
+import { cmdEscape, getFileNameFromURL, randomWord } from '../src/utils'
 
 const downloadsDir = 'downloads'
 const segmentsDir = 'segments'
@@ -16,8 +16,8 @@ const commandSupplier = {
   downloadFiles() {
     const url = ARGS.download.url
     if (url) {
-      const ep = escapePath(`${downloadsDir}/audio_${getFileNameFromURL(url)}`)
-      return `curl -kL -o ${ep} ${escapePath(url)}`
+      const ep = cmdEscape(`${downloadsDir}/audio_${getFileNameFromURL(url)}`)
+      return `curl -kL -o ${ep} ${cmdEscape(url)}`
     }
     throw new Error(`download 参数中未指定 url`)
   },
@@ -27,7 +27,7 @@ const commandSupplier = {
   ffmpegSplit() {
     const split = ARGS.ffmpeg?.split || 600
     const files = fs.readdirSync(downloadsDir)
-    const filePath = files.map(fn => escapePath(path.join(downloadsDir, fn)))[0]
+    const filePath = files.map(fn => cmdEscape(path.join(downloadsDir, fn)))[0]
     return `ffmpeg -i ${filePath} -f segment -segment_time ${split} -c copy ${segmentsDir}/%d.${ARGS.download.ext}`
   },
   /**
@@ -49,7 +49,7 @@ const commandSupplier = {
     }
     const optionStr = Object.entries(options).map(([k, v]) => `${k} ${v}`).join(' ')
     const files = fs.readdirSync(segmentsDir)
-    const filePaths = files.map(fn => escapePath(path.join(segmentsDir, fn)))
+    const filePaths = files.map(fn => cmdEscape(path.join(segmentsDir, fn)))
     return filePaths.map(p => `spleeter separate ${optionStr} ${p}`).join('\n')
   },
   /**
@@ -70,7 +70,7 @@ const commandSupplier = {
       const filepath = `${separatesDir}/${instrument}/segments.txt`
       fs.writeFileSync(filepath, segmentPaths.join('\n'))
       const originFileName = fs.readdirSync(downloadsDir)[0]
-      const outputName = escapePath(`${originFileName}_${instrument}.${ext}`)
+      const outputName = cmdEscape(`${originFileName}_${instrument}.${ext}`)
       cmds.push(`ffmpeg -f concat -safe 0 -i ${filepath} -c copy ${outputsDir}/${outputName}`)
     }
     return cmds.join('\n')
@@ -82,6 +82,8 @@ const ME = {
     const supplier = commandSupplier[key]
     if (supplier) {
       core.exportVariable('COMMANDS', supplier())
+    } else if (key === 'RANDOM_NAME') {
+      core.exportVariable(key, randomWord())
     } else {
       core.setFailed(`不支持的变量: ${key}`)
     }
@@ -93,13 +95,6 @@ if (ME[directive]) {
   ME[directive](process.argv[3])
 } else {
   core.setFailed(`未知的指令: ${directive}`)
-}
-
-/**
- * 转义文件路径
- */
-function escapePath(p) {
-  return `'${p.replaceAll(`'`, `'\\''`)}'`
 }
 
 /*
