@@ -69,7 +69,9 @@ const commandSupplier = {
       }
       const filepath = `${separatesDir}/${instrument}/segments.txt`
       fs.writeFileSync(filepath, segmentPaths.join('\n'))
-      cmds.push(`ffmpeg -f concat -safe 0 -i ${filepath} -c copy ${outputsDir}/${instrument}.${ext}`)
+      const originFileName = fs.readdirSync(downloadsDir)[0]
+      const outputName = escapePath(`${originFileName}_${instrument}.${ext}`)
+      cmds.push(`ffmpeg -f concat -safe 0 -i ${filepath} -c copy ${outputsDir}/${outputName}`)
     }
     return cmds.join('\n')
   }
