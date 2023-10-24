@@ -14,17 +14,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-      - name: Create Env State
-        run: |
-          npm install
-          npm run build-create-env-state
-          node workflow-distributor/dist/index.js
+
       - id: step1
         run: |
-          echo '${{ inputs.args }}'
+          echo '${{ env.ARGS }}'
+
       - id: step2
         run: pwd
+
       - id: step3
         run: ls -l
-      - id: step4
-        run: echo "$args1 - ${{ env.args2 }}"
