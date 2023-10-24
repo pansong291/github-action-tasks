@@ -25,7 +25,7 @@ const commandSupplier = {
    * ffmpeg 分割音频
    */
   ffmpegSplit() {
-    const split = ARGS.ffmpeg?.split || 600
+    const split = ARGS.ffmpeg?.split || 300
     const files = fs.readdirSync(downloadsDir)
     const filePath = files.map(fn => cmdEscape(path.join(downloadsDir, fn)))[0]
     return `ffmpeg -i ${filePath} -f segment -segment_time ${split} -c copy ${segmentsDir}/%d.${ARGS.download.ext}`
