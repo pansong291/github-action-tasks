@@ -1,4 +1,5 @@
 import url from 'node:url'
+import * as github from '@actions/github'
 
 export function getFileNameFromURL(fileUrl, def = '') {
   const urlObj = url.parse(fileUrl)
@@ -19,19 +20,9 @@ export function cmdEscape(p) {
 }
 
 /**
- * 获取随机标识符
- * @param len 长度
+ * 执行 transfer
  */
-export function randomWord(len = 8) {
-  const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  len = Math.floor(Math.abs(len))
-  let result = ''
-  while (len > 0) {
-    const r = Math.random()
-    let n = r * characters.length
-    if (n < 10 && !result) n = r * (characters.length - 10) + 10
-    result += characters.charAt(Math.floor(n))
-    len--
-  }
-  return result
+export function transfer(args) {
+  const backend = args.transfer?.['--backend'] || 'trs'
+  return `curl -sL https://raw.githubusercontent.com/Mikubill/transfer/master/install.sh | sh\n./transfer ${backend} ./artifact_${github.context.runId}.zip`
 }

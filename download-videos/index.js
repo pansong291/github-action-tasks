@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import fs from 'node:fs'
-import { randomWord } from '../src/utils'
+import * as utils from '../src/utils'
 
 const configFilePath = 'config.txt'
 const batchFilePath = 'batch-file.txt'
@@ -47,6 +47,9 @@ const commandSupplier = {
       throw new Error('--batch-file 和 --yes-playlist 参数必须至少指定其中一个')
     }
     return `yt-dlp --config-location ${configFilePath}`
+  },
+  transfer() {
+    return utils.transfer(ARGS)
   }
 }
 
@@ -55,8 +58,6 @@ const ME = {
     const supplier = commandSupplier[key]
     if (supplier) {
       core.exportVariable('COMMANDS', supplier())
-    } else if (key === 'RANDOM_NAME') {
-      core.exportVariable(key, randomWord())
     } else {
       core.setFailed(`不支持的变量: ${key}`)
     }

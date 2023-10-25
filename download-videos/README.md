@@ -17,7 +17,11 @@
       "--batch-file": [
         "https://www.youtube.com/watch?v=jF3er5lsaeg"
       ],
-      "--yes-playlist": "https://www.youtube.com/playlist?list=PL-454Fe3dQH1L38FnKkz_O1CqYx6sKaXk"
+      "--yes-playlist": "https://www.youtube.com/playlist?list=PL-454Fe3dQH1L38FnKkz_O1CqYx6sKaXk",
+      "--recode-video": "mp4"
+    },
+    "transfer": {
+      "--backend": "gg"
     }
   }
 }
@@ -32,3 +36,5 @@
 | --format | 指定下载的媒体格式。参见 [Video Format Options](https://github.com/yt-dlp/yt-dlp#video-format-options) | `bestvideo+bestaudio` |
 | --compat-options | 指定合并选项，比如 `no-direct-merge`。参见 [General Options](https://github.com/yt-dlp/yt-dlp#general-options) |  |
 | --recode-video | 将视频转码为其他格式，可用值：`avi` `flv` `gif` `mkv` `mov` `mp4` `webm` `aac` `aiff` `alac` `flac` `m4a` `mka` `mp3` `ogg` `opus` `vorbis` `wav`。参见 [Post-Processing Options](https://github.com/yt-dlp/yt-dlp#post-processing-options) |  |
+- `transfer` 对象
+  - `--backend` 指定文件传输服务，默认为 `trs`，详见 [Mikubill/transfer](https://github.com/Mikubill/transfer) 。

@@ -44,15 +44,14 @@ jobs:
         run: |
           ${{ env.COMMANDS }}
 
-      - name: Prepare random name
-        run: |
-          node dist/index.js prepare-env RANDOM_NAME
-
       - name: Compress file
         run: |
-          zip -9 -r artifact_${{ env.RANDOM_NAME }}.zip downloads
+          zip -9 -r artifact_${{ github.run_id }}.zip downloads
+
+      - name: Prepare transfer commands
+        run: |
+          node dist/index.js prepare-env transfer
 
       - name: Upload artifact
         run: |
-          curl -sL https://raw.githubusercontent.com/Mikubill/transfer/master/install.sh | sh
-          ./transfer gg ./artifact_${{ env.RANDOM_NAME }}.zip
+          ${{ env.COMMANDS }}

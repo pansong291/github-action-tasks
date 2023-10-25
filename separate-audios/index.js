@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import * as core from '@actions/core'
-import { cmdEscape, getFileNameFromURL, randomWord } from '../src/utils'
+import * as utils from '../src/utils'
 
 const downloadsDir = 'downloads'
 const segmentsDir = 'segments'
@@ -16,8 +16,8 @@ const commandSupplier = {
   downloadFiles() {
     const url = ARGS.download.url
     if (url) {
-      const ep = cmdEscape(`${downloadsDir}/audio_${getFileNameFromURL(url)}`)
-      return `curl -kL -o ${ep} ${cmdEscape(url)}`
+      const ep = utils.cmdEscape(`${downloadsDir}/audio_${utils.getFileNameFromURL(url)}`)
+      return `curl -kL -o ${ep} ${utils.cmdEscape(url)}`
     }
     throw new Error(`download 参数中未指定 url`)
   },
@@ -25,21 +25,21 @@ const commandSupplier = {
    * ffmpeg 分割音频
    */
   ffmpegSplit() {
-    const split = ARGS.ffmpeg?.split || 300
+    const split = ARGS.ffmpeg?.['-segment_time'] || 300
     const files = fs.readdirSync(downloadsDir)
-    const filePath = files.map(fn => cmdEscape(path.join(downloadsDir, fn)))[0]
+    const filePath = files.map(fn => utils.cmdEscape(path.join(downloadsDir, fn)))[0]
     return `ffmpeg -i ${filePath} -f segment -segment_time ${split} -c copy ${segmentsDir}/%d.${ARGS.download.ext}`
   },
   /**
    * 运行 spleeter
    */
   spleeter() {
-    const availableOptions = ['-b', '-c', '-p']
+    const availableOptions = ['--bitrate', '--codec', '--params_filename']
     const options = {
-      '-o': separatesDir,
-      '-d': '660', // 11 分钟，实际上音频的长度需要小于这个值
-      '-f': '{instrument}/{filename}.{codec}',
-      '-c': 'wav'
+      '--output_path': separatesDir,
+      '--duration': '660', // 11 分钟，实际上音频的长度需要小于这个值
+      '--filename_format': '{instrument}/{filename}.{codec}',
+      '--codec': 'wav'
     }
     const spleeterArgs = ARGS.spleeter
     if (spleeterArgs) {
@@ -49,7 +49,7 @@ const commandSupplier = {
     }
     const optionStr = Object.entries(options).map(([k, v]) => `${k} ${v}`).join(' ')
     const files = fs.readdirSync(segmentsDir)
-    const filePaths = files.map(fn => cmdEscape(path.join(segmentsDir, fn)))
+    const filePaths = files.map(fn => utils.cmdEscape(path.join(segmentsDir, fn)))
     return filePaths.map(p => `spleeter separate ${optionStr} ${p}`).join('\n')
   },
   /**
@@ -70,10 +70,13 @@ const commandSupplier = {
       const filepath = `${separatesDir}/${instrument}/segments.txt`
       fs.writeFileSync(filepath, segmentPaths.join('\n'))
       const originFileName = fs.readdirSync(downloadsDir)[0]
-      const outputName = cmdEscape(`${originFileName}_${instrument}.${ext}`)
+      const outputName = utils.cmdEscape(`${originFileName}_${instrument}.${ext}`)
       cmds.push(`ffmpeg -f concat -safe 0 -i ${filepath} -c copy ${outputsDir}/${outputName}`)
     }
     return cmds.join('\n')
+  },
+  transfer() {
+    return utils.transfer(ARGS)
   }
 }
 
@@ -82,8 +85,6 @@ const ME = {
     const supplier = commandSupplier[key]
     if (supplier) {
       core.exportVariable('COMMANDS', supplier())
-    } else if (key === 'RANDOM_NAME') {
-      core.exportVariable(key, randomWord())
     } else {
       core.setFailed(`不支持的变量: ${key}`)
     }

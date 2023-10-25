@@ -18,10 +18,13 @@
       "ext": "mp3"
     },
     "ffmpeg": {
-      "split": 300
+      "-segment_time": 300
     },
     "spleeter": {
-      "-c": "mp3"
+      "--codec": "mp3"
+    },
+    "transfer": {
+      "--backend": "trs"
     }
   }
 }
@@ -32,11 +35,13 @@
   - `url` 指定音频文件的下载链接，必填。
   - `ext` 指定输入音频文件的后缀，需要与音频文件的格式匹配，必填。
 - `ffmpeg` 对象
-  - `split` 指定分段的秒数，用于将音频文件分割成相同时间的分段，当执行出错时有可能是音频文件过大导致占用内存过多，可以减少这个值以降低内存占用，默认为 `300` 秒。
+  - `-segment_time` 指定分段的秒数，用于将音频文件分割成相同时间的分段，当执行出错时有可能是音频文件过大导致占用内存过多，可以减少这个值以降低内存占用，默认为 `300` 秒。
 - `spleeter` 对象中仅支持一部分 [spleeter](https://github.com/deezer/spleeter/) 的参数，如下所示：
 
 | 参数 | 值 / 类型 | 说明 | 默认值 |
 | ---- | ---- | ---- | ---- |
-| -b | TEXT | Audio bitrate to be used for the separated output | `128k` |
-| -c | `wav` `mp3` `ogg` `m4a` `wma` `flac` | Audio codec to be used for the separated output | `wav` |
-| -p | TEXT | JSON filename that contains params | `spleeter:2stems` |
+| --bitrate | TEXT | Audio bitrate to be used for the separated output | `128k` |
+| --codec | `wav` `mp3` `ogg` `m4a` `wma` `flac` | Audio codec to be used for the separated output | `wav` |
+| --params_filename | TEXT | JSON filename that contains params | `spleeter:2stems` |
+- `transfer` 对象
+  - `--backend` 指定文件传输服务，默认为 `trs`，详见 [Mikubill/transfer](https://github.com/Mikubill/transfer) 。
