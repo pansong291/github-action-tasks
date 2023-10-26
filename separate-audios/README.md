@@ -14,8 +14,9 @@
   "run": "separate-audios",
   "args": {
     "download": {
-      "url": "https://github.com/pansong291/github-action-tasks/raw/main/test/west-world.mp3",
-      "ext": "mp3"
+      "urls": [
+        "https://github.com/pansong291/github-action-tasks/raw/main/test/west-world.mp3"
+      ]
     },
     "ffmpeg": {
       "-segment_time": 300
@@ -32,8 +33,7 @@
 ````
 
 - `download` 对象
-  - `url` 指定音频文件的下载链接，必填。
-  - `ext` 指定输入音频文件的后缀，需要与音频文件的格式匹配，必填。
+  - `urls` 音频文件的下载链接数组，不能为空。
 - `ffmpeg` 对象
   - `-segment_time` 指定分段的秒数，用于将音频文件分割成相同时间的分段，当执行出错时有可能是音频文件过大导致占用内存过多，可以减少这个值以降低内存占用，默认为 `300` 秒。
 - `spleeter` 对象中仅支持一部分 [spleeter](https://github.com/deezer/spleeter/) 的参数，如下所示：

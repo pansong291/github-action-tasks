@@ -1,5 +1,4 @@
 import fs from 'node:fs'
-import path from 'node:path'
 import * as core from '@actions/core'
 import * as utils from '../src/utils'
 
@@ -14,21 +13,25 @@ const commandSupplier = {
    * 下载文件
    */
   downloadFiles() {
-    const url = ARGS.download.url
-    if (url) {
-      const ep = utils.cmdEscape(`${downloadsDir}/audio_${utils.getFileNameFromURL(url)}`)
-      return `curl -kL -o ${ep} ${utils.cmdEscape(url)}`
+    const urls = ARGS.download.urls
+    if (urls && Array.isArray(urls)) {
+      return urls.map((url, i) => {
+        const ep = utils.cmdEscape(`${downloadsDir}/${i}_${utils.getFileNameFromURL(url)}`)
+        return `curl -kL -o ${ep} ${utils.cmdEscape(url)}`
+      }).join('\n')
     }
-    throw new Error(`download 参数中未指定 url`)
+    throw new Error(`download 参数中未指定 urls 数组`)
   },
   /**
    * ffmpeg 分割音频
    */
   ffmpegSplit() {
     const split = ARGS.ffmpeg?.['-segment_time'] || 300
-    const files = fs.readdirSync(downloadsDir)
-    const filePath = files.map(fn => utils.cmdEscape(path.join(downloadsDir, fn)))[0]
-    return `ffmpeg -i ${filePath} -f segment -segment_time ${split} -c copy ${segmentsDir}/%d.${ARGS.download.ext}`
+    return fs.readdirSync(downloadsDir).map((f) => {
+      const order = f.substring(0, f.indexOf('_'))
+      const filePath = utils.cmdEscape(`${downloadsDir}/${f}`)
+      return `ffmpeg -i ${filePath} -f segment -segment_time ${split} -c copy ${segmentsDir}/${order}_%d.nut`
+    }).join('\n')
   },
   /**
    * 运行 spleeter
@@ -36,7 +39,6 @@ const commandSupplier = {
   spleeter() {
     const availableOptions = ['--bitrate', '--codec', '--params_filename']
     const options = {
-      '--output_path': separatesDir,
       '--duration': '660', // 11 分钟，实际上音频的长度需要小于这个值
       '--filename_format': '{instrument}/{filename}.{codec}',
       '--codec': 'wav'
@@ -48,9 +50,11 @@ const commandSupplier = {
       }
     }
     const optionStr = Object.entries(options).map(([k, v]) => `${k} ${v}`).join(' ')
-    const files = fs.readdirSync(segmentsDir)
-    const filePaths = files.map(fn => utils.cmdEscape(path.join(segmentsDir, fn)))
-    return filePaths.map(p => `spleeter separate ${optionStr} ${p}`).join('\n')
+
+    return fs.readdirSync(segmentsDir).map(f => {
+      const order = f.substring(0, f.indexOf('_'))
+      return `spleeter separate --output_path ${separatesDir}/${order} ${optionStr} ${utils.cmdEscape(`${segmentsDir}/${f}`)}`
+    }).join('\n')
   },
   /**
    * ffmpeg 合并音频
@@ -58,21 +62,28 @@ const commandSupplier = {
   ffmpegConcat() {
     const cmds = []
     const instruments = ['vocals', 'accompaniment']
-    for (const instrument of instruments) {
-      const audioFiles = fs.readdirSync(`${separatesDir}/${instrument}`)
-      const count = audioFiles.length
-      const first = audioFiles[0]
-      const ext = first.substring(first.indexOf('.') + 1)
-      const segmentPaths = []
-      for (let i = 0; i < count; i++) {
-        segmentPaths.push(`file '${i}.${ext}'`)
+    const originFileName = {}
+    fs.readdirSync(downloadsDir).forEach(f => {
+      const order = f.substring(0, f.indexOf('_'))
+      originFileName[order] = f
+    })
+    fs.readdirSync(separatesDir).forEach(order => {
+      for (const instrument of instruments) {
+        const instPath = `${separatesDir}/${order}/${instrument}`
+        const audioFiles = fs.readdirSync(instPath)
+        const count = audioFiles.length
+        const first = audioFiles[0]
+        const ext = first.substring(first.indexOf('.') + 1)
+        const segmentPaths = []
+        for (let i = 0; i < count; i++) {
+          segmentPaths.push(`file '${order}_${i}.${ext}'`)
+        }
+        const filepath = `${instPath}/segments.txt`
+        fs.writeFileSync(filepath, segmentPaths.join('\n'))
+        const outputName = utils.cmdEscape(`${outputsDir}/${originFileName[order]}_${instrument}.${ext}`)
+        cmds.push(`ffmpeg -f concat -safe 0 -i ${filepath} -c copy ${outputName}`)
       }
-      const filepath = `${separatesDir}/${instrument}/segments.txt`
-      fs.writeFileSync(filepath, segmentPaths.join('\n'))
-      const originFileName = fs.readdirSync(downloadsDir)[0]
-      const outputName = utils.cmdEscape(`${originFileName}_${instrument}.${ext}`)
-      cmds.push(`ffmpeg -f concat -safe 0 -i ${filepath} -c copy ${outputsDir}/${outputName}`)
-    }
+    })
     return cmds.join('\n')
   },
   transfer() {
