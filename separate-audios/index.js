@@ -61,14 +61,13 @@ const commandSupplier = {
    */
   ffmpegConcat() {
     const cmds = []
-    const instruments = ['vocals', 'accompaniment']
     const originFileName = {}
     fs.readdirSync(downloadsDir).forEach(f => {
       const order = f.substring(0, f.indexOf('_'))
       originFileName[order] = f
     })
     fs.readdirSync(separatesDir).forEach(order => {
-      for (const instrument of instruments) {
+      fs.readdirSync(`${separatesDir}/${order}`).forEach(instrument => {
         const instPath = `${separatesDir}/${order}/${instrument}`
         const audioFiles = fs.readdirSync(instPath)
         const count = audioFiles.length
@@ -82,7 +81,7 @@ const commandSupplier = {
         fs.writeFileSync(filepath, segmentPaths.join('\n'))
         const outputName = utils.cmdEscape(`${outputsDir}/${originFileName[order]}_${instrument}.${ext}`)
         cmds.push(`ffmpeg -f concat -safe 0 -i ${filepath} -c copy ${outputName}`)
-      }
+      })
     })
     return cmds.join('\n')
   },
