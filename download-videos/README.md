@@ -33,7 +33,7 @@
 | 参数 | 说明 | 默认值 |
 | ---- | ---- | ---- |
 | --yes-playlist | 指定一个播放列表。参见 [Video Selection](https://github.com/yt-dlp/yt-dlp#video-selection) |  |
-| --format | 指定下载的媒体格式。参见 [Video Format Options](https://github.com/yt-dlp/yt-dlp#video-format-options) | `bestvideo+bestaudio` |
+| --format | 指定下载的媒体格式。参见 [Video Format Options](https://github.com/yt-dlp/yt-dlp#video-format-options) | `best*` |
 | --compat-options | 指定合并选项，比如 `no-direct-merge`。参见 [General Options](https://github.com/yt-dlp/yt-dlp#general-options) |  |
 | --recode-video | 将视频转码为其他格式，可用值：`avi` `flv` `gif` `mkv` `mov` `mp4` `webm` `aac` `aiff` `alac` `flac` `m4a` `mka` `mp3` `ogg` `opus` `vorbis` `wav`。参见 [Post-Processing Options](https://github.com/yt-dlp/yt-dlp#post-processing-options) |  |
 - `transfer` 对象

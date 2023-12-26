@@ -13,7 +13,7 @@ const commandSupplier = {
   ytDlp() {
     const availableOptions = ['--batch-file', '--yes-playlist', '--format', '--compat-options', '--recode-video']
     const options = {
-      '--format': 'bestvideo+bestaudio',
+      '--format': 'best*',
       '--output': 'downloads/%(title)s_%(id)s.%(ext)s'
     }
     const param = { hasBatchFile: false, hasPlaylist: false, urls: [] }
