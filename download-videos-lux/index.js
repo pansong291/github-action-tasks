@@ -69,7 +69,7 @@ const commandSupplier = {
     } else if (!param.hasPlaylist) {
       throw new Error('-F 和 -p 参数必须至少指定其中一个')
     }
-    return `lux ${optionStr}`
+    return `./lux ${optionStr}`
   },
   transfer() {
     return utils.transfer(ARGS)
