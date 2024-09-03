@@ -1,6 +1,6 @@
-import * as core from '@actions/core'
 import fs from 'node:fs'
 import * as utils from '../src/utils'
+import { runCommand } from '../src/utils'
 
 const configFilePath = 'config.txt'
 const batchFilePath = 'batch-file.txt'
@@ -53,20 +53,4 @@ const commandSupplier = {
   }
 }
 
-const ME = {
-  'prepare-env': (key) => {
-    const supplier = commandSupplier[key]
-    if (supplier) {
-      core.exportVariable('COMMANDS', supplier())
-    } else {
-      core.setFailed(`不支持的变量: ${key}`)
-    }
-  }
-}
-
-const directive = process.argv[2]
-if (ME[directive]) {
-  ME[directive](process.argv[3])
-} else {
-  core.setFailed(`未知的指令: ${directive}`)
-}
+runCommand(commandSupplier)
