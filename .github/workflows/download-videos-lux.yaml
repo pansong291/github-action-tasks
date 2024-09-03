@@ -35,7 +35,7 @@ jobs:
       - name: 下载 lux / Download lux
         run: |
           ${{ env.COMMANDS }}
-          tar -zxvf downloads/lux.tar.gz
+          tar -zxvf temp/lux.tar.gz
 
       - name: 准备下载 / Prepare lux commands
         run: node dist/index.js prepare-env lux
