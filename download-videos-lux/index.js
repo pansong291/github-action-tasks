@@ -36,7 +36,7 @@ const commandSupplier = {
    * 运行 lux
    */
   lux() {
-    const availableOptions = ['-F', '-p', '-items', '-c', '-n']
+    const availableOptions = ['-F', '-p', '-items', '-c', '-n', '-retry']
     const options = {
       '-o': downloadsDir,
       '-n': 1
