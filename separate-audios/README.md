@@ -1,6 +1,6 @@
 # 简介
 
-使用 GitHub Actions 分离人声。
+使用 GitHub Actions 运行 [spleeter](https://github.com/deezer/spleeter/) 分离人声。
 
 ## 原理
 

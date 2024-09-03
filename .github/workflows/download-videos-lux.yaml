@@ -1,4 +1,4 @@
-name: download-videos-dlp
+name: download-videos-lux
 
 on:
   workflow_call:
@@ -18,40 +18,36 @@ jobs:
       - name: 构建 JS 文件 / Build JS Files
         run: |
           npm install
-          npm run build-download-videos-dlp
+          npm run build-download-videos-lux
 
       - name: 准备工作空间 / Prepare workspace
         run: |
-          mv download-videos-dlp/* ./
+          mv download-videos-lux/* ./
+          mkdir temp
           mkdir downloads
-
-      - name: 安装 Python / Set up python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
 
       - name: 安装 ffmpeg / Set up ffmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
 
-      - name: 安装 yt-dlp / Install yt-dlp
-        run: python -m pip install -U yt-dlp
+      - name: 准备下载 lux / Prepare download lux commands
+        run: node dist/index.js prepare-env downloadLux
 
-      - name: 准备下载 / Prepare yt-dlp commands
+      - name: 下载 lux / Download lux
         run: |
-          node dist/index.js prepare-env ytDlp
+          ${{ env.COMMANDS }}
+          tar -zxvf downloads/lux.tar.gz
+
+      - name: 准备下载 / Prepare lux commands
+        run: node dist/index.js prepare-env lux
 
       - name: 下载视频 / Download video
-        run: |
-          ${{ env.COMMANDS }}
+        run: ${{ env.COMMANDS }}
 
       - name: 压缩文件 / Compress file
-        run: |
-          zip -9 -r artifact_${{ github.run_id }}.zip downloads
+        run: zip -9 -r artifact_${{ github.run_id }}.zip downloads
 
       - name: 准备上传 / Prepare transfer commands
-        run: |
-          node dist/index.js prepare-env transfer
+        run: node dist/index.js prepare-env transfer
 
       - name: 上传成品 / Upload artifact
-        run: |
-          ${{ env.COMMANDS }}
+        run: ${{ env.COMMANDS }}

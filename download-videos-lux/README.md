@@ -1,19 +1,19 @@
 # 简介
 
-使用 GitHub Actions 运行 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 下载视频。原项目 [justjavac/github-actions-youtube-dl](https://github.com/justjavac/github-actions-youtube-dl) 。
+使用 GitHub Actions 运行 [lux](https://github.com/iawia002/lux) 下载视频。
 
 ## 原理
 
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+- [lux](https://github.com/iawia002/lux)
 
 ## 示例
 在 [issue](https://github.com/pansong291/github-action-tasks/issues) 提交以下内容（ ``` 符号必须单独占一行）：
 ````markdown
 ```json
 {
-  "run": "download-videos-dlp",
+  "run": "download-videos-lux",
   "args": {
-    "yt-dlp": {
+    "lux": {
       "--batch-file": [
         "https://www.youtube.com/watch?v=jF3er5lsaeg"
       ],
@@ -28,7 +28,7 @@
 ```
 ````
 
-- `yt-dlp` 对象中仅支持一部分 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的参数，其中 `--batch-file` 参数与 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 不同，它应为视频文件的下载链接数组，其余的如下所示：
+- `lux` 对象中仅支持一部分 [lux](https://github.com/iawia002/lux) 的参数，其中 `--batch-file` 参数与 [lux](https://github.com/iawia002/lux) 不同，它应为视频文件的下载链接数组，其余的如下所示：
 
 | 参数 | 说明 | 默认值 |
 | ---- | ---- | ---- |

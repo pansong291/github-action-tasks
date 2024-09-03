@@ -6,8 +6,9 @@ Performing tasks using GitHub Actions.
 
 ## 任务列表
 
-- [下载视频](./download-videos-dlp)
-- [人声分离](./separate-audios)
+- [使用 yt-dlp 下载视频](./download-videos-dlp)
+- [使用 lux 下载视频](./download-videos-lux)
+- [使用 spleeter 分离人声](./separate-audios)
 
 ## 使用
 
