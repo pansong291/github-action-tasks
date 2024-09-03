@@ -35,7 +35,6 @@ jobs:
 
       - name: 安装 ffmpeg / Set up ffmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
-        id: setup-ffmpeg
 
       # - name: Install libsndfile
       #   run: sudo apt install libsndfile

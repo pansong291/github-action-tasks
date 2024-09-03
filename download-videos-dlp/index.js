@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import * as utils from '../src/utils'
 import { runCommand } from '../src/utils'
 
+const downloadsDir = 'downloads'
 const configFilePath = 'config.txt'
 const batchFilePath = 'batch-file.txt'
 const ARGS = JSON.parse(process.env.ARGS)
@@ -14,7 +15,7 @@ const commandSupplier = {
     const availableOptions = ['--batch-file', '--yes-playlist', '--format', '--compat-options', '--recode-video']
     const options = {
       '--format': 'best*',
-      '--output': 'downloads/%(title)s_%(id)s.%(ext)s'
+      '--output': `${downloadsDir}/%(title)s_%(id)s.%(ext)s`
     }
     const param = { hasBatchFile: false, hasPlaylist: false, urls: [] }
     const ytDlpArgs = ARGS['yt-dlp']

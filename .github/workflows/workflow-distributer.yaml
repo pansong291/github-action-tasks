@@ -42,3 +42,10 @@ jobs:
       args: ${{ needs.distributor.outputs.args }}
     if: ${{ needs.distributor.outputs.run == 'download-videos-dlp' }}
     uses: ./.github/workflows/download-videos-dlp.yaml
+
+  download-videos-lux:
+    needs: distributor
+    with:
+      args: ${{ needs.distributor.outputs.args }}
+    if: ${{ needs.distributor.outputs.run == 'download-videos-lux' }}
+    uses: ./.github/workflows/download-videos-lux.yaml
