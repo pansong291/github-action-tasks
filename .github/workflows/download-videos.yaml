@@ -12,46 +12,46 @@ jobs:
     env:
       ARGS: ${{ inputs.args }}
     steps:
-      - name: Clone repository
+      - name: 检出仓库 / Clone repository
         uses: actions/checkout@v2
 
-      - name: Build JS Files
+      - name: 构建 JS 文件 / Build JS Files
         run: |
           npm install
           npm run build-download-videos
 
-      - name: Prepare workspace
+      - name: 准备工作空间 / Prepare workspace
         run: |
           mv download-videos/* ./
 
-      - name: Set up python
+      - name: 安装 Python / Set up python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
 
-      - name: Set up ffmpeg
+      - name: 安装 ffmpeg / Set up ffmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
         id: setup-ffmpeg
 
-      - name: Install yt-dlp
+      - name: 安装 yt-dlp / Install yt-dlp
         run: python -m pip install -U yt-dlp
 
-      - name: Prepare yt-dlp commands
+      - name: 准备下载 / Prepare yt-dlp commands
         run: |
           node dist/index.js prepare-env ytDlp
 
-      - name: Download video
+      - name: 下载视频 / Download video
         run: |
           ${{ env.COMMANDS }}
 
-      - name: Compress file
+      - name: 压缩文件 / Compress file
         run: |
           zip -9 -r artifact_${{ github.run_id }}.zip downloads
 
-      - name: Prepare transfer commands
+      - name: 准备上传 / Prepare transfer commands
         run: |
           node dist/index.js prepare-env transfer
 
-      - name: Upload artifact
+      - name: 上传成品 / Upload artifact
         run: |
           ${{ env.COMMANDS }}

@@ -13,10 +13,10 @@ jobs:
       run: ${{ steps.distribute.outputs.run }}
       args: ${{ steps.distribute.outputs.args }}
     steps:
-      - name: Checkout Repository
+      - name: 检出仓库 / Checkout Repository
         uses: actions/checkout@v2
       - id: distribute
-        name: Distribute Tasks
+        name: 分配任务 / Distribute Tasks
         run: |
           npm install
           npm run build-distribute
