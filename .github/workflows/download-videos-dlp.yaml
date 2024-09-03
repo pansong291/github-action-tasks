@@ -1,4 +1,4 @@
-name: download-videos
+name: download-videos-dlp
 
 on:
   workflow_call:
@@ -18,11 +18,11 @@ jobs:
       - name: 构建 JS 文件 / Build JS Files
         run: |
           npm install
-          npm run build-download-videos
+          npm run build-download-videos-dlp
 
       - name: 准备工作空间 / Prepare workspace
         run: |
-          mv download-videos/* ./
+          mv download-videos-dlp/* ./
 
       - name: 安装 Python / Set up python
         uses: actions/setup-python@v2

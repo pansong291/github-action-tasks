@@ -5,7 +5,7 @@
   "author": "pansong291",
   "scripts": {
     "build-distribute": "ncc build workflow-distributor/index.js -o workflow-distributor/dist",
-    "build-download-videos": "ncc build download-videos/index.js -o download-videos/dist",
+    "build-download-videos-dlp": "ncc build download-videos-dlp/index.js -o download-videos-dlp/dist",
     "build-separate-audios": "ncc build separate-audios/index.js -o separate-audios/dist"
   },
   "dependencies": {

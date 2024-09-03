@@ -36,9 +36,9 @@ jobs:
     if: ${{ needs.distributor.outputs.run == 'separate-audios' }}
     uses: ./.github/workflows/separate-audios.yaml
 
-  download-videos:
+  download-videos-dlp:
     needs: distributor
     with:
       args: ${{ needs.distributor.outputs.args }}
-    if: ${{ needs.distributor.outputs.run == 'download-videos' }}
-    uses: ./.github/workflows/download-videos.yaml
+    if: ${{ needs.distributor.outputs.run == 'download-videos-dlp' }}
+    uses: ./.github/workflows/download-videos-dlp.yaml
