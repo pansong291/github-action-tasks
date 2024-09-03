@@ -11,7 +11,7 @@
 ````markdown
 ```json
 {
-  "run": "download-videos",
+  "run": "download-videos-dlp",
   "args": {
     "yt-dlp": {
       "--batch-file": [

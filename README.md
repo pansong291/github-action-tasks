@@ -6,7 +6,7 @@ Performing tasks using GitHub Actions.
 
 ## 任务列表
 
-- [下载视频](./download-videos)
+- [下载视频](./download-videos-dlp)
 - [人声分离](./separate-audios)
 
 ## 使用
